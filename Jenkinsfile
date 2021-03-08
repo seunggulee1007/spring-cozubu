@@ -23,4 +23,21 @@ node {
         }
     }
 
+    withCredentials([sshUserPrivateKey(credentialsId: 'dev-server', keyFileVariable: 'identity', passphraseVariable: '', usernameVariable: 'ubuntu')]) {
+            def remote = [:]
+            remote.name = "springboot-cozubu"
+            remote.host = "13.209.86.32"
+            remote.allowAnyHosts = true
+            remote.user = ubuntu
+            remote.identityFile = identity //remote.passphrase = passphrase
+            stage("SSH Docker Image Pull") {
+                sshCommand remote: remote, command: "docker stop cozubu.cf/cozubu/springboot-cozubu:latest || true && docker rm cozubu.cf/cozubu/springboot-cozubu:latest || true"
+                sshCommand remote: remote, command: "docker rmi cozubu.cf/cozubu/springboot-cozubu:latest || true"
+            }
+            stage("Docker run") {
+                sshCommand remote: remote, command: "docker run -p 9090:9090 cozubu.cf/cozubu/springboot-cozubu:latest"
+            }
+        }
+
+    }
 }
