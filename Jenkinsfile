@@ -25,7 +25,7 @@ node {
 
     stage("SSH Docker Image Pull") {
         def dockerRun = 'sudo docker run -p 9090:9090 cozubu.cf/cozubu/springboot-cozubu:latest'
-        def harboLogin = 'docker login https://cozubu.cf -u leesg107@naver.com -p dusqhd1djrWlrwk1!'
+        def harboLogin = 'sudo docker login https://cozubu.cf -u leesg107@naver.com -p dusqhd1djrWlrwk1!'
         sshagent(['dev-server']) {
             sh "ssh -o StrictHostKeyChecking=no ubuntu@13.209.86.32 ${harboLogin}"
             sh "ssh -o StrictHostKeyChecking=no ubuntu@13.209.86.32 ${dockerRun}"
