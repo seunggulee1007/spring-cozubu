@@ -17,7 +17,7 @@ node {
     }
 
     stage("Docker Image Push") {
-        withDockerRegistry(credentialsId: 'harbor_docker_repository', url: 'cozubu.cf') {
+        withDockerRegistry(credentialsId: 'harbor_docker_repository', url: 'https://cozubu.cf') {
             // some block
             sh "docker push cozubu.cf/cozubu/springboot-cozubu:latest"
         }
