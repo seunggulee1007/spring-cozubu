@@ -24,7 +24,7 @@ node {
     }
 
     stage("SSH Docker Image Pull") {
-        def dockerRun = 'docker run -p 9090:9090 cozubu.cf/cozubu/vue-cozubu:latest'
+        def dockerRun = 'sudo docker run -p 9090:9090 cozubu.cf/cozubu/vue-cozubu:latest'
         sshagent(['dev-server']) {
             sh "ssh -o StrictHostKeyChecking=no ubuntu@13.209.86.32 ${dockerRun}"
         }
