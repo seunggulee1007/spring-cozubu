@@ -25,13 +25,11 @@ node {
 
     stage("SSH Docker Image Pull") {
         def dockerRun = 'sudo docker run -p 9090:9090 cozubu.cf/cozubu/springboot-cozubu:latest'
-        withDockerRegistry(credentialsId: 'harbor_docker_repository', url: 'https://cozubu.cf') {
-            // some block
-            sh "docker push cozubu.cf/cozubu/springboot-cozubu:latest"
+        sshagent(['dev-server']) {
+            withDockerRegistry(credentialsId: 'harbor_docker_repository', url: 'https://cozubu.cf') {
+                sh "ssh -o StrictHostKeyChecking=no ubuntu@13.209.86.32 ${dockerRun}"
+            }
         }
-//         sshagent(['dev-server']) {
-//             sh "ssh -o StrictHostKeyChecking=no ubuntu@13.209.86.32 ${dockerRun}"
-//         }
     }
 
 
