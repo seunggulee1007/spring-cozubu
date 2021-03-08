@@ -1,31 +1,27 @@
 node {
 
     stage('git source Pull') {
-        git(
-           url: "${GIT_URL}",
-           credentialsId: "${CREDIT_ID}",
-           branch: "${BRANCH}"
-        )
+        checkout scm
     }
 
     stage("Docker Image build") {
-        sh(script: "docker build -t springboot-cozubu:latest .")
+        sh(script: "docker build -t ${IMAGE_NAME}:latest .")
     }
 
     stage("Docker Image tag") {
-        sh(script: "docker tag springboot-cozubu:latest cozubu.cf/cozubu/springboot-cozubu:latest")
+        sh(script: "docker tag ${IMAGE_NAME}:latest ${HARBOR_URL}/${HARBOR_PROJECT}/${IMAGE_NAME}:latest")
     }
 
     stage("Docker Image Push") {
         withDockerRegistry(credentialsId: 'harbor_docker_repository', url: 'https://cozubu.cf') {
             // some block
-            sh "docker push cozubu.cf/cozubu/springboot-cozubu:latest"
+            sh "docker push ${HARBOR_URL}/${HARBOR_PROJECT}/${IMAGE_NAME}:latest"
         }
     }
 
     stage("SSH Docker Image Pull") {
-        def dockerRun = 'sudo docker run -p 9090:9090 cozubu.cf/cozubu/springboot-cozubu:latest'
-        def harboLogin = 'sudo docker login https://cozubu.cf -u leesg107@naver.com -p dusqhd1djrWlrwk1!'
+        def dockerRun = 'sudo docker run -p 9090:9090 ${HARBOR_URL}/${HARBOR_PROJECT}/${IMAGE_NAME}:latest'
+        def harboLogin = 'sudo docker login https://${HARBOR_URL} -u ${HARBOR_USER} -p ${HARBOR_PWD}!'
         sshagent(['dev-server']) {
             sh "ssh -o StrictHostKeyChecking=no ubuntu@13.209.86.32 ${harboLogin}"
             sh "ssh -o StrictHostKeyChecking=no ubuntu@13.209.86.32 ${dockerRun}"
