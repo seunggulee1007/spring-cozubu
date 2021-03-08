@@ -24,7 +24,7 @@ node {
     }
 
     stage("SSH Docker Image Pull") {
-        def dockerRun = 'sudo docker run -p 9090:9090 cozubu.cf/cozubu/vue-cozubu:latest'
+        def dockerRun = 'sudo docker run -p 9090:9090 cozubu.cf/cozubu/springboot-cozubu:latest'
         sshagent(['dev-server']) {
             withDockerRegistry(credentialsId: 'harbor_docker_repository', url: 'https://cozubu.cf') {
                 // some block
