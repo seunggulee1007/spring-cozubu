@@ -28,9 +28,9 @@ node {
         sshagent(['dev-server']) {
             withDockerRegistry(credentialsId: 'harbor_docker_repository', url: 'https://cozubu.cf') {
                 // some block
-                sh "docker pull cozubu.cf/cozubu/springboot-cozubu:latest"
+                sh "ssh -o StrictHostKeyChecking=no ubuntu@13.209.86.32 ${dockerRun}"
             }
-            sh "ssh -o StrictHostKeyChecking=no ubuntu@13.209.86.32 ${dockerRun}"
+
         }
     }
 
