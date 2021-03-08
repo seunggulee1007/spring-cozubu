@@ -24,7 +24,7 @@ node {
         def harboLogin = 'sudo docker login https://${HARBOR_URL} -u ${HARBOR_USER} -p ${HARBOR_PWD}'
         def dockerRmi = 'sudo docker stop ${IMAGE_NAME} || true  && sudo docker rm ${IMAGE_NAME} || true && sudo docker rmi ${HARBOR_URL}/${HARBOR_PROJECT}/${IMAGE_NAME}:latest || true'
         sshagent(['dev-server']) {
-            sh "ssh -o StrictHostKeyChecking=no ${dockerRmi}"
+            sh "ssh -o StrictHostKeyChecking=no ${REMOTE_URL} ${dockerRmi}"
             sh "ssh -o StrictHostKeyChecking=no ${REMOTE_URL} ${harboLogin}"
             sh "ssh -o StrictHostKeyChecking=no ${REMOTE_URL} ${dockerRun}"
         }
