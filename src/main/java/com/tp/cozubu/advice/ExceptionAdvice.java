@@ -16,8 +16,8 @@ import javax.servlet.http.HttpServletRequest;
 
 /**
  * 커스텀 예외 처리
- * @author es-seungglee
  *
+ * @author es-seungglee
  */
 @RequiredArgsConstructor
 @RestControllerAdvice
@@ -33,7 +33,7 @@ public class ExceptionAdvice {
                 .build();
         return resultVO;
     }
-    
+
     @ExceptionHandler(NoVersionException.class)
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     protected ResultVO noVersionException(Exception e) {
@@ -44,7 +44,7 @@ public class ExceptionAdvice {
                 .build();
         return resultVO;
     }
-    
+
     @ExceptionHandler(AccessDeniedException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public ResultVO accessDeniedException(AccessDeniedException e, HttpServletRequest request) {
@@ -65,7 +65,7 @@ public class ExceptionAdvice {
                 .build();
         return resultVO;
     }
-    
+
     @ExceptionHandler(NoMemberException.class)
     @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
     public ResultVO NoMemberException(NoMemberException e, HttpServletRequest request) {
@@ -75,9 +75,9 @@ public class ExceptionAdvice {
                 .errMsg(e.getStackTrace()[0].toString())
                 .build();
         return resultVO;
-        
+
     }
-    
+
     @ExceptionHandler(AlreadyMemberException.class)
     @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
     public ResultVO AlreadyMemberException(AlreadyMemberException e, HttpServletRequest request) {
@@ -88,7 +88,7 @@ public class ExceptionAdvice {
                 .build();
         return resultVO;
     }
-    
+
     @ExceptionHandler(FalseIDException.class)
     @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
     public ResultVO FalseIDException(FalseIDException e, HttpServletRequest request) {
@@ -99,7 +99,7 @@ public class ExceptionAdvice {
                 .build();
         return resultVO;
     }
-    
+
     @ExceptionHandler(BizServiceException.class)
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     protected ResultVO BizServiceException(BizServiceException e, HttpServletRequest request) {
@@ -109,7 +109,7 @@ public class ExceptionAdvice {
                 .errMsg(e.getStackTrace()[0].toString())
                 .build();
     }
-    
+
     @ExceptionHandler(CommonUtilException.class)
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     protected ResultVO CommonUtilException(CommonUtilException e, HttpServletRequest request) {
@@ -129,5 +129,5 @@ public class ExceptionAdvice {
                 .errMsg(e.getStackTrace()[0].toString())
                 .build();
     }
-    
+
 }
