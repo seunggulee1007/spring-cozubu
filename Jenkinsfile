@@ -21,7 +21,7 @@ node {
 
     stage("SSH Docker Container Run") {
         def dockerRun = 'sudo docker run -d -p 9090:8080 --name ${IMAGE_NAME} ${HARBOR_URL}/${HARBOR_PROJECT}/${IMAGE_NAME}:latest'
-        def harboLogin = 'sudo docker login https://${HARBOR_URL} -u ${HARBOR_USER} -p ${HARBOR_PWD}'
+        def harboLogin = 'echo ${HARBOR_PWD} | sudo docker login https://${HARBOR_URL} -u ${HARBOR_USER} --password-stdin '
         def dockerStop = 'sudo docker stop ${IMAGE_NAME} || true'
         def dockerRm = 'sudo docker rm ${IMAGE_NAME} || true'
         def dockerRmi = 'sudo docker rmi ${HARBOR_URL}/${HARBOR_PROJECT}/${IMAGE_NAME} || true'
