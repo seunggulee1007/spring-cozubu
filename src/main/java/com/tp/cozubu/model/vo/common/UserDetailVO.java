@@ -11,17 +11,17 @@ import java.util.List;
 
 @Builder
 @Data
-public class UserDetailVO  implements UserDetails {
+public class UserDetailVO implements UserDetails {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = -1107315069350306896L;
-    
-    private String userId;
-    
+
+    private String username;
+
     private String password;
-    
+
     @Builder.Default
     private List<String> roles = new ArrayList<>();
 

@@ -6,19 +6,16 @@ import com.tp.cozubu.advice.exception.FalseIDException;
 import com.tp.cozubu.advice.exception.NoMemberException;
 import com.tp.cozubu.config.JwtTokenProvider;
 import com.tp.cozubu.enums.CommonMsg;
-import com.tp.cozubu.model.dao.UserDao;
-import com.tp.cozubu.model.vo.common.FileVO;
+import com.tp.cozubu.model.entity.User;
+import com.tp.cozubu.model.mapper.UserMapper;
 import com.tp.cozubu.model.vo.common.ResultVO;
-import com.tp.cozubu.model.vo.common.UserVO;
 import com.tp.cozubu.util.FileUtil;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,66 +24,42 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-    
-    private final UserDao userDao;
+
+    private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
     private final FileUtil fileUtil;
 
     /**
-     * 사용자 리스트 조회
-     * @param deptCd
-     * @return
-     */
-    public ResultVO selectUserList(int deptCd) {
-        return ResultVO.builder().data(userDao.selectUserListByDeptId(deptCd)).build();
-    }
-
-    /**
-     * 사용자 등록
-     * @param request
-     * @param userVO
-     * @return
-     */
-    @Transactional
-    public ResultVO insertUser(HttpServletRequest request, UserVO userVO) {
-        UserVO user = userDao.selectUser(userVO.getUserId()).orElseGet(() -> new UserVO());
-        if(!StringUtils.isEmpty(user.getUserId())) {
-            throw new AlreadyMemberException();
-        }
-        userVO.setPassword(passwordEncoder.encode(userVO.getUserId() + "123!@"));
-
-        return ResultVO.builder().resultMsg("등록되었습니다").build();
-    }
-
-    /**
      * 회원 가입
+     *
      * @param userVO
      * @return
      * @throws AlreadyMemberException
      */
     @Transactional
-    public ResultVO signUp(UserVO userVO) throws AlreadyMemberException {
-        UserVO user = userDao.selectUser(userVO.getUserId()).orElseGet(() -> new UserVO());
-        if(!StringUtils.isEmpty(user.getUserId())) {
+    public ResultVO signUp(User userVO) throws AlreadyMemberException {
+        User user = userMapper.findByUsername(userVO.getUsername()).orElseGet(() -> new User());
+        if (!StringUtils.isEmpty(user.getUsername())) {
             throw new AlreadyMemberException();
         }
         userVO.setPassword(passwordEncoder.encode(userVO.getPassword()));
-        userDao.insertUser(userVO);
+        userMapper.save(userVO);
         return ResultVO.builder().resultMsg("등록되었습니다").build();
     }
 
     /**
      * 로그인
+     *
      * @param userVO
      * @return
      */
-    public ResultVO signIn(UserVO userVO) {
+    public ResultVO signIn(User userVO) {
         List<String> authorities = new ArrayList<>();
-        UserVO user = userDao.selectUser(userVO.getUserId()).orElseThrow(NoMemberException::new);
+        User user = userMapper.findByUsername(userVO.getUsername()).orElseThrow(NoMemberException::new);
         authorities.add("ROLE_USER");
         if (!passwordEncoder.matches(userVO.getPassword(), user.getPassword())) throw new FalseIDException();
-        String token = jwtTokenProvider.createToken(user.getUserId(), authorities);
+        String token = jwtTokenProvider.createToken(user.getUsername(), authorities);
         Map<String, Object> map = new HashMap<>();
         user.setPassword(null);
         map.put("authToken", token);
@@ -94,31 +67,15 @@ public class UserServiceImpl implements UserService {
         return ResultVO.builder().data(map).resultMsg(CommonMsg.SUCCESS_LOGIN.getMsg()).build();
     }
 
-    @Transactional
-    public ResultVO chgPwd(UserVO userVO) {
-        UserVO user = userDao.selectUser(userVO.getUserId()).orElseThrow(NoMemberException::new);
-        String resultMsg = "비밀번호 변경에 실패하였습니다.";
-        long result = -1;
-        if (!passwordEncoder.matches(userVO.getPassword(), user.getPassword())) throw new FalseIDException();
-        if(userDao.updatePwd(userVO) > 0) {
-            resultMsg = "비밀번호 변경에 성공하였습니다.";
-            result = 0;
+    public ResultVO updatePwd(String username, String nowPwd, String chgPwd, String confirmPwd) throws Exception {
+        if (!nowPwd.equals(chgPwd)) {
+            throw new Exception("변경할 비밀번호가 일치하지 않습니다.");
         }
-        
-        return ResultVO.builder().result(result).resultMsg(resultMsg).build();
-        
-    }
-
-    /**
-     * 사용자 변경
-     * @param request
-     * @param userVO
-     * @return
-     */
-    @Transactional
-    public ResultVO updateUser(HttpServletRequest request, UserVO userVO){
-        userDao.updateUser(userVO);
-        return ResultVO.builder().resultMsg("수정되었습니다").build();
+        User user = userMapper.findByUsername(username).orElseThrow(NoMemberException::new);
+        if (!passwordEncoder.matches(nowPwd, user.getPassword())) throw new FalseIDException();
+        user.setPassword(passwordEncoder.encode(chgPwd));
+        userMapper.save(user);
+        return ResultVO.builder().resultMsg("비밀번호가 변경 되었습니다.").build();
     }
 
 }

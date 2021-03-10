@@ -49,3 +49,5 @@ logging:
         type:
           descriptor:
             sql: trace
+  file:
+    path: /home/user/api/log
