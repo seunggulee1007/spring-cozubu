@@ -58,6 +58,12 @@ dependencies {
     compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.11'
     // https://mvnrepository.com/artifact/commons-io/commons-io
     compile group: 'commons-io', name: 'commons-io', version: '2.6'
+
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    // https://mvnrepository.com/artifact/org.springframework.session/spring-session-data-redis
+    implementation group: 'org.springframework.session', name: 'spring-session-data-redis', version: '2.4.2'
+
+
 }
 
 test {

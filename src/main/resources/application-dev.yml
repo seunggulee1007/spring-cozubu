@@ -37,7 +37,9 @@ spring:
       cache: false
   jwt:
     secret: govlepel@$&
-
+  redis:
+    host: 15.164.199.15
+    port: 6379
 
 file:
   upload-dir: /home/tomcat/img/

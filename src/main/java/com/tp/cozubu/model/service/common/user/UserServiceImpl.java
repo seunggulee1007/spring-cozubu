@@ -59,7 +59,7 @@ public class UserServiceImpl implements UserService {
         User user = userMapper.findByUsername(userVO.getUsername()).orElseThrow(NoMemberException::new);
         authorities.add("ROLE_USER");
         if (!passwordEncoder.matches(userVO.getPassword(), user.getPassword())) throw new FalseIDException();
-        String token = jwtTokenProvider.createToken(user.getUsername(), authorities);
+        String token = jwtTokenProvider.createAccessToken(user.getUsername(), authorities);
         Map<String, Object> map = new HashMap<>();
         user.setPassword(null);
         map.put("authToken", token);

@@ -24,50 +24,57 @@ import java.util.List;
 @RequiredArgsConstructor
 @Component
 public class JwtTokenProvider {
-    
+
+    private final static long REFRESH_TOKEN_VALIDATION_SECOND = 1000L * 60 * 24 * 2;
+    private final static long TOKEN_VALIDATION_SECOND = 1000L * 60 * 60;    // 1시간 동안만 토큰 유효
+    private final UserDetailsService userDetailsService;
     @Value("spring.jwt.secret")
     private String secretKey;
-    
-    private long tokenValidMilisecont = 1000L * 60 * 60;    // 1시간 동안만 토큰 유효
-    
-    private final UserDetailsService userDetailsService;
-    
+
     @PostConstruct
     protected void init() {
         secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
     }
-    
-    public String createToken(String userId, List<String> roles) {
+
+    public String createAccessToken(String userId, List<String> roles) {
+        return createToken(userId, roles, TOKEN_VALIDATION_SECOND);
+    }
+
+    public String createRefreshToken(String userId, List<String> roles) {
+        return createToken(userId, roles, REFRESH_TOKEN_VALIDATION_SECOND);
+    }
+
+    public String createToken(String userId, List<String> roles, long expireTime) {
         Claims claims = Jwts.claims().setSubject(userId);
         claims.put("roles", roles);
         Date now = new Date();
         return Jwts.builder()
-                    .setClaims(claims)  // 데이터
-                    .setIssuedAt(now)   // 토큰 발행 일자
-                    .setExpiration(new Date(now.getTime() + tokenValidMilisecont))  // 만료 시간 추가
-                    .signWith(SignatureAlgorithm.HS256, secretKey)      // 암호화 알고리즘, secret값 세팅
-                    .compact();
+                .setClaims(claims)  // 데이터
+                .setIssuedAt(now)   // 토큰 발행 일자
+                .setExpiration(new Date(now.getTime() + TOKEN_VALIDATION_SECOND))  // 만료 시간 추가
+                .signWith(SignatureAlgorithm.HS256, secretKey)      // 암호화 알고리즘, secret값 세팅
+                .compact();
     }
-    
+
     // Jwt 토큰으로 인증 정보를 조회
     public Authentication getAuthentication(String token) {
         UserDetails userDetails = userDetailsService.loadUserByUsername(this.getUserId(token));
         List<GrantedAuthority> authorities = new ArrayList<>();
         GrantedAuthority role = new SimpleGrantedAuthority("ROLE_USER");
         authorities.add(role);
-        return new UsernamePasswordAuthenticationToken(userDetails,  "", authorities);
+        return new UsernamePasswordAuthenticationToken(userDetails, "", authorities);
     }
-    
+
     // Jwt 토큰에서 회원 구별 정보 추출
     public String getUserId(String token) {
         return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getSubject();
     }
-    
+
     // Request의 Header에서 token 파싱 : "X-AUTH-TOKEN : jwt토큰"
     public String resolveToken(HttpServletRequest req) {
         return req.getHeader("X-AUTH-TOKEN");
     }
-    
+
     // Jwt 토큰의 유효성 + 만료일자 확인
     public boolean validateToken(String jwtToken) {
         try {
@@ -77,5 +84,5 @@ public class JwtTokenProvider {
             return false;
         }
     }
-    
+
 }

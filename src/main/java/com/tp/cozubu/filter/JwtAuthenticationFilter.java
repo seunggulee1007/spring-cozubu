@@ -16,28 +16,28 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class JwtAuthenticationFilter extends GenericFilterBean {
-    
+
     private JwtTokenProvider jwtTokenProvider;
-    
+
     // Jwt Provider 주입
     public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider) {
         this.jwtTokenProvider = jwtTokenProvider;
     }
-    
+
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain) throws IOException, ServletException{
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain) throws IOException, ServletException {
         String token = jwtTokenProvider.resolveToken((HttpServletRequest) request);
-        if(token != null && jwtTokenProvider.validateToken(token)) {
+        if (token != null && jwtTokenProvider.validateToken(token)) {
             Authentication auth = jwtTokenProvider.getAuthentication(token);
-            SecurityContextHolder.getContext().setAuthentication(auth);;
+            SecurityContextHolder.getContext().setAuthentication(auth);
             String userId = jwtTokenProvider.getUserId(token);
             List<String> authorities = new ArrayList<>();
             authorities.add("ROLE_USER");
-            token = jwtTokenProvider.createToken(userId, authorities);
+            token = jwtTokenProvider.createAccessToken(userId, authorities);
             HttpServletResponse httpServletResponse = (HttpServletResponse) response;
             httpServletResponse.setHeader("ACCESS_TOKEN", token);
         }
         filterChain.doFilter(request, response);
     }
-    
+
 }
