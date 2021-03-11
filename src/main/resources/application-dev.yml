@@ -38,7 +38,7 @@ spring:
   jwt:
     secret: govlepel@$&
   redis:
-    host: 15.164.199.15
+    host: redis-cozubu
     port: 6379
 
 file:

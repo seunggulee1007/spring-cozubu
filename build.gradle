@@ -63,6 +63,7 @@ dependencies {
     // https://mvnrepository.com/artifact/org.springframework.session/spring-session-data-redis
     implementation group: 'org.springframework.session', name: 'spring-session-data-redis', version: '2.4.2'
 
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
 }
 

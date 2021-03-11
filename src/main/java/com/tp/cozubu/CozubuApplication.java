@@ -1,8 +1,11 @@
 package com.tp.cozubu;
 
+import com.tp.cozubu.config.GracefulShutdown;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
+import org.springframework.boot.web.servlet.server.ConfigurableServletWebServerFactory;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
@@ -27,4 +30,15 @@ public class CozubuApplication extends SpringBootServletInitializer {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 
+    @Bean
+    public GracefulShutdown gracefulShutdown() {
+        return new GracefulShutdown();
+    }
+
+    @Bean
+    public ConfigurableServletWebServerFactory webServerFactory(final GracefulShutdown gracefulShutdown) {
+        TomcatServletWebServerFactory factory = new TomcatServletWebServerFactory();
+        factory.addConnectorCustomizers(gracefulShutdown);
+        return factory;
+    }
 }
