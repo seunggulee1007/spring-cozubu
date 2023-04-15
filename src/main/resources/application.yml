@@ -4,9 +4,9 @@ spring:
       on-profile: local
   ## datasource 설정
   datasource:
-    url: jdbc:log4jdbc:postgresql://cozubu.cf:5432/cozubu
-    username: cozubu
-    password: 1susdp1djrqjfwk1!Q
+    url: url
+    username: username
+    password: password
     driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
     # driver-class-name: org.mariadb.jdbc.Driver
     hikari:
@@ -37,7 +37,7 @@ spring:
     freemarker:
       cache: false
   jwt:
-    secret: govlepel@$&
+    secret: secret
 
 
 file:
